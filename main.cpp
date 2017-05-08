@@ -15,7 +15,7 @@ public:
         if (request.method == "POST")
         {
             //you can get the post body with .body
-            cout << "post body:" << endl << request.body << endl;
+            cout << "post body:" << endl << request.data<< endl;
         }
         //these are the required response fields. Make sure they're all filled in
         HTTPResponse response;
@@ -32,7 +32,7 @@ int main()
 	//create a handler instance
 	MyHandler hnd;
 	//create a server instance
-	HTTPServer server(1103);
+	HTTPServer server(1104);
 	//start the server
     server.SetHandler(&hnd);
 	server.Start();

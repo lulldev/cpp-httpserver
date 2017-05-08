@@ -20,7 +20,7 @@ struct HTTPRequest
 {
     std::string path;
     std::string method;
-    std::string body;
+    std::string data = "";
 };
 
 struct HTTPResponse
@@ -43,7 +43,7 @@ public:
     HTTPServer(int port);
     void Start();
     void Stop();
-    void Accept();
+    HTTPRequest Accept();
     void SetHandler(HTTPRequestHandler *handler);
 
 private:

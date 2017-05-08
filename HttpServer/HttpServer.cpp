@@ -1,5 +1,7 @@
 #include "HttpServer.h"
 
+//using namespace std;
+
 static void* InvokeAccept(void* server)
 {
     ((HTTPServer*)server)->Accept();
@@ -63,7 +65,7 @@ void HTTPServer::Stop()
 }
 
 
-void HTTPServer::Accept()
+HTTPRequest HTTPServer::Accept()
 {
     struct sockaddr_in clientAddr;
     socklen_t sockSize = sizeof(clientAddr);
@@ -90,64 +92,40 @@ void HTTPServer::Accept()
 
     HTTPRequest request;
     request.method = "";
-    int ind = 0;
-    while (buffer[ind] != ' ')
+    int responseStrCounter = 0;
+    while (buffer[responseStrCounter] != ' ')
     {
-        request.method += buffer[ind++];
+        request.method += buffer[responseStrCounter++];
     }
-    ind++;
+
+    responseStrCounter++;
     request.path = "";
-    while (buffer[ind] != ' ')
+
+    while (buffer[responseStrCounter] != ' ')
     {
-        if (buffer[ind] == '%')
+        if (buffer[responseStrCounter] == '%')
         {
-            char *endPtr = buffer + ind + 3;
-            request.path += (char) strtol(buffer + ind + 1, &endPtr, 16);
-            ind += 3;
+            char *endPtr = buffer + responseStrCounter + 3;
+            request.path += (char) strtol(buffer + responseStrCounter + 1, &endPtr, 16);
+            responseStrCounter += 3;
         } else
         {
-            request.path += buffer[ind++];
-        }
-    }
-    if (request.method == "POST")
-    {
-        bool foundStart = false;
-        int numSlNs = 0;
-        while (!foundStart)
-        {
-            if (buffer[ind] == '\n')
-            {
-                numSlNs++;
-                if (numSlNs >= 2)
-                    foundStart = true;
-            } else if ((buffer[ind] != '\r') && (buffer[ind] != ' '))
-                numSlNs = 0;
-            ind++;
-        }
-        request.body = "";
-        for (; ind < readSocket; ind++)
-        {
-            request.body += buffer[ind];
-        }
-        while (readSocket == HTTP_SERVER_BUFFER_SIZE)
-        {
-            ind = 0;
-            readSocket = read(acceptSocket, buffer, HTTP_SERVER_BUFFER_SIZE);
-            for (; ind < readSocket; ind++)
-            {
-                request.body += buffer[ind];
-            }
+            request.path += buffer[responseStrCounter++];
         }
     }
 
-    HTTPResponse response = m_handler->HandleRequest(request);
+    close(acceptSocket);
+    pthread_exit(NULL);
+    return request;
+
+/*    HTTPResponse response = m_handler->HandleRequest(request);
     std::stringstream respStr;
     respStr << "HTTP/1.1 " << response.code << " OK\r\n" << "Content-Type: " << response.contentType
             << "; charset=utf-8\r\n" << "Content-Length: " << response.body.size() << "\r\n\r\n" << response.body;
     readSocket = write(acceptSocket, respStr.str().c_str(), respStr.str().size());
     if (readSocket < 0) error("ERROR writing to socket");
     close(acceptSocket);
-    pthread_exit(NULL);
+    pthread_exit(NULL);*/
 }
 
 void HTTPServer::error(const char *msg)
