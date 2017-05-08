@@ -9,4 +9,6 @@ public:
     void HandleRequests();
 private:
     HTTPServer m_httpServer;
+    void HandleGet(HTTPRequest& acceptHTTP);
+    //    void HandleDelete();
 };

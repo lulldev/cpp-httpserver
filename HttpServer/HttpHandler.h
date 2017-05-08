@@ -2,8 +2,8 @@
 
 struct HTTPRequest
 {
-    std::string path;
     std::string method;
+    std::string path;
     std::string data = "";
 };
 

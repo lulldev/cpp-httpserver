@@ -65,6 +65,7 @@ HTTPRequest HTTPServer::Accept()
     struct sockaddr_in clientAddr;
     socklen_t sockSize = sizeof(clientAddr);
     int acceptSocket = accept(m_sockfd, (struct sockaddr *) &clientAddr, &sockSize);
+    m_acceptSocket = acceptSocket;
     int thread = pthread_create(&m_acceptThreadId, NULL, InvokeAccept, (void *) this);
     if (thread)
     {
@@ -122,6 +123,17 @@ HTTPRequest HTTPServer::Accept()
     close(acceptSocket);
     pthread_exit(NULL);*/
 }
+
+int HTTPServer::GetSocket()const
+{
+    return m_sockfd;
+}
+
+int HTTPServer::GetAcceptSocket()const
+{
+    return m_acceptSocket;
+}
+
 
 bool HTTPServer::IsWork()const
 {

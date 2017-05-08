@@ -27,12 +27,15 @@ public:
     void Stop();
     bool IsWork()const;
     HTTPRequest Accept();
+    int GetSocket()const;
+    int GetAcceptSocket()const;
 
 private:
     int m_port;
     bool m_started;
     pthread_t m_acceptThreadId;
     int m_sockfd;
+    int m_acceptSocket;
 
     void error(const char *msg);
 };
