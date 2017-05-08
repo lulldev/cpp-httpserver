@@ -25,6 +25,7 @@ public:
     HTTPServer(int port);
     void Start();
     void Stop();
+    bool IsWork()const;
     HTTPRequest Accept();
 
 private:

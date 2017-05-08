@@ -123,6 +123,11 @@ HTTPRequest HTTPServer::Accept()
     pthread_exit(NULL);*/
 }
 
+bool HTTPServer::IsWork()const
+{
+    return m_started;
+}
+
 void HTTPServer::error(const char *msg)
 {
     perror(msg);
