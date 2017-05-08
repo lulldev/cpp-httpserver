@@ -13,11 +13,6 @@ HTTPServer::HTTPServer(int port)
 {
 }
 
-void HTTPServer::SetHandler(HTTPRequestHandler *handler)
-{
-    m_handler = handler;
-}
-
 void HTTPServer::Start()
 {
     if (m_started)
@@ -77,7 +72,7 @@ HTTPRequest HTTPServer::Accept()
     }
 
     char buffer[HTTP_SERVER_BUFFER_SIZE];
-    int readSocket;
+    ssize_t readSocket;
 
     if (acceptSocket < 0)
     {
@@ -115,7 +110,7 @@ HTTPRequest HTTPServer::Accept()
     }
 
     close(acceptSocket);
-    pthread_exit(NULL);
+//    pthread_exit(NULL);
     return request;
 
 /*    HTTPResponse response = m_handler->HandleRequest(request);
