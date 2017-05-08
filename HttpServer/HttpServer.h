@@ -11,6 +11,7 @@
 #include <string>
 #include <pthread.h>
 #include <sstream>
+#include <iostream>
 
 #define HTTP_SERVER_BUFFER_SIZE 1024
 #define HTTP_MAX_CONNECTIONS 10
@@ -33,19 +34,20 @@ struct HTTPResponse
 class HTTPRequestHandler
 {
 public:
-    virtual HTTPResponse handleRequest(HTTPRequest request) = 0;
+    virtual HTTPResponse HandleRequest(HTTPRequest request) = 0;
 };
 
 class HTTPServer
 {
 public:
-    HTTPServer(HTTPRequestHandler *hndl, int port);
+    HTTPServer(int port);
     void Start();
     void Stop();
     void Accept();
+    void SetHandler(HTTPRequestHandler *handler);
 
 private:
-    HTTPRequestHandler * handler;
+    HTTPRequestHandler *m_handler;
     int m_port;
     bool m_started;
     pthread_t m_acceptThreadId;

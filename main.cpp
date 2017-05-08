@@ -8,7 +8,7 @@ class MyHandler : public HTTPRequestHandler
 {
 public:
     //method that will handle the requests
-    HTTPResponse handleRequest(HTTPRequest request)
+    HTTPResponse HandleRequest(HTTPRequest request)
     {
         //you can get the method and the path with .method and .path
         cout << request.method << " request to " << request.path << endl;
@@ -32,8 +32,9 @@ int main()
 	//create a handler instance
 	MyHandler hnd;
 	//create a server instance
-	HTTPServer server(&hnd, 1102);
+	HTTPServer server(1103);
 	//start the server
+    server.SetHandler(&hnd);
 	server.Start();
 	cout << "Press enter at any time to stop" << endl;
 	//wait untill the user presses enter and quits

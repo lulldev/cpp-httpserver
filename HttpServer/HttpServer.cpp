@@ -1,16 +1,19 @@
 #include "HttpServer.h"
 
-
-static void *invokeAccept(void *server)
+static void* InvokeAccept(void* server)
 {
-    ((HTTPServer *) server)->Accept();
+    ((HTTPServer*)server)->Accept();
 }
 
-HTTPServer::HTTPServer(HTTPRequestHandler *hndl, int port)
-    : handler(hndl)
-    , m_port(port)
+HTTPServer::HTTPServer(int port)
+    : m_port(port)
     , m_started(false)
 {
+}
+
+void HTTPServer::SetHandler(HTTPRequestHandler *handler)
+{
+    m_handler = handler;
 }
 
 void HTTPServer::Start()
@@ -41,8 +44,8 @@ void HTTPServer::Start()
 
     listen(m_sockfd, HTTP_MAX_CONNECTIONS);
 
-    int rc = pthread_create(&m_acceptThreadId, NULL, invokeAccept, (void *) this);
-    if (rc)
+    int thread = pthread_create(&m_acceptThreadId, NULL, InvokeAccept, (void *) this);
+    if (thread)
     {
         error("ERROR on starting new thread");
     }
@@ -62,25 +65,36 @@ void HTTPServer::Stop()
 
 void HTTPServer::Accept()
 {
-    struct sockaddr_in cli_addr;
-    socklen_t clilen = sizeof(cli_addr);
-    int newm_sockfd = accept(m_sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    int rc = pthread_create(&m_acceptThreadId, NULL, invokeAccept, (void *) this);
-    if (rc)
+    struct sockaddr_in clientAddr;
+    socklen_t sockSize = sizeof(clientAddr);
+    int acceptSocket = accept(m_sockfd, (struct sockaddr *) &clientAddr, &sockSize);
+    int thread = pthread_create(&m_acceptThreadId, NULL, InvokeAccept, (void *) this);
+    if (thread)
+    {
         error("ERROR on starting new thread");
+    }
 
     char buffer[HTTP_SERVER_BUFFER_SIZE];
-    int n;
+    int readSocket;
 
-    if (newm_sockfd < 0)
+    if (acceptSocket < 0)
+    {
         error("ERROR on accept");
-    n = read(newm_sockfd, buffer, HTTP_SERVER_BUFFER_SIZE);
-    if (n < 0) error("ERROR reading from socket");
+    }
+
+    readSocket = read(acceptSocket, buffer, HTTP_SERVER_BUFFER_SIZE);
+    if (readSocket < 0)
+    {
+        error("ERROR reading from socket");
+    }
+
     HTTPRequest request;
     request.method = "";
     int ind = 0;
     while (buffer[ind] != ' ')
+    {
         request.method += buffer[ind++];
+    }
     ind++;
     request.path = "";
     while (buffer[ind] != ' ')
@@ -111,27 +125,28 @@ void HTTPServer::Accept()
             ind++;
         }
         request.body = "";
-        for (; ind < n; ind++)
+        for (; ind < readSocket; ind++)
         {
             request.body += buffer[ind];
         }
-        while (n == HTTP_SERVER_BUFFER_SIZE)
+        while (readSocket == HTTP_SERVER_BUFFER_SIZE)
         {
             ind = 0;
-            n = read(newm_sockfd, buffer, HTTP_SERVER_BUFFER_SIZE);
-            for (; ind < n; ind++)
+            readSocket = read(acceptSocket, buffer, HTTP_SERVER_BUFFER_SIZE);
+            for (; ind < readSocket; ind++)
             {
                 request.body += buffer[ind];
             }
         }
     }
-    HTTPResponse response = handler->handleRequest(request);
+
+    HTTPResponse response = m_handler->HandleRequest(request);
     std::stringstream respStr;
     respStr << "HTTP/1.1 " << response.code << " OK\r\n" << "Content-Type: " << response.contentType
             << "; charset=utf-8\r\n" << "Content-Length: " << response.body.size() << "\r\n\r\n" << response.body;
-    n = write(newm_sockfd, respStr.str().c_str(), respStr.str().size());
-    if (n < 0) error("ERROR writing to socket");
-    close(newm_sockfd);
+    readSocket = write(acceptSocket, respStr.str().c_str(), respStr.str().size());
+    if (readSocket < 0) error("ERROR writing to socket");
+    close(acceptSocket);
     pthread_exit(NULL);
 }
 
