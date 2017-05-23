@@ -2,7 +2,6 @@
 
 #include "HttpServer/HttpServer.h"
 #include "FileServer/MyRestHandler.h"
-#include "FileServer/FileHelper/FileHelper.h"
 
 using namespace std;
 
@@ -24,27 +23,23 @@ int main(int argc, const char* argv[])
         // todo validate target root
         string targetRootDir = argv[2];
 
-        FileHelper fileHelper(targetRootDir);
-        fileHelper.GetDirectoryContent(targetRootDir);
-        fileHelper.DeleteFile("/Users/lull/Documents/capital-building-2.jpg");
+        MyRestHandler restHandler;
+        restHandler.SetServerRootDir(targetRootDir);
+
+        HTTPServer server(&restHandler, port);
+
+        server.Start();
+        cout << "[+] Server start at " << port << " port!\n"
+             << "Input some for stopping server" << endl;
+
+        string inputStr;
+        getline(cin, inputStr);
+        server.Stop();
     }
     catch (const std::exception& e)
     {
         cout << e.what() << endl;
     }
-
-    return 11;
-
-    MyRestHandler restHandler;
-	HTTPServer server(&restHandler, port);
-
-	server.Start();
-	cout << "[+] Server start at " << port << " port!\n"
-		 << "Input some for stopping server" << endl;
-
-	string inputStr;
-	getline(cin, inputStr);
-	server.Stop();
 
 	return 0;
 }
