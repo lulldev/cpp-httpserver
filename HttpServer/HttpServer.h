@@ -31,6 +31,7 @@ private:
     bool m_isStarted;
     pthread_t m_acceptThreadId;
     int m_sockfd;
+    void ValidatePort(size_t port);
 
     void error(const char *msg);
 };

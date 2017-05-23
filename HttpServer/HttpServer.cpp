@@ -5,6 +5,15 @@ HTTPServer::HTTPServer(HTTPRequestHandler *hndl, int port)
     , m_port(port)
     , m_isStarted(false)
 {
+    ValidatePort(m_port);
+}
+
+void HTTPServer::ValidatePort(size_t port)
+{
+    if ((port < 0 && port > 65536))
+    {
+        throw std::invalid_argument("Port must be [1-65536]");
+    }
 }
 
 static void *InvokeAsyncAccept(void *server)

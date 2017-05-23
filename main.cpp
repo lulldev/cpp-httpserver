@@ -14,13 +14,9 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-    size_t port;
-
     try
     {
-        // todo validate port
-        port = stoi(argv[1]);
-        // todo validate target root
+        size_t port = stoi(argv[1]);
         string targetRootDir = argv[2];
 
         MyRestHandler restHandler;
