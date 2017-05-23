@@ -1,6 +1,8 @@
 #include "lib/stdc++.h"
+
 #include "HttpServer/HttpServer.h"
 #include "FileServer/MyRestHandler.h"
+#include "FileServer/FileHelper/FileHelper.h"
 
 using namespace std;
 
@@ -13,12 +15,27 @@ int main(int argc, const char* argv[])
 		return 1;
 	}
 
-	// todo validate port
-	size_t port = stoi(argv[1]);
-	// todo validate target root
-	string targetRootDir = argv[2];
+    size_t port;
 
-	MyRestHandler restHandler;
+    try
+    {
+        // todo validate port
+        port = stoi(argv[1]);
+        // todo validate target root
+        string targetRootDir = argv[2];
+
+        FileHelper fileHelper(targetRootDir);
+        fileHelper.GetDirectoryContent(targetRootDir);
+        fileHelper.DeleteFile("/Users/lull/Documents/capital-building-2.jpg");
+    }
+    catch (const std::exception& e)
+    {
+        cout << e.what() << endl;
+    }
+
+    return 11;
+
+    MyRestHandler restHandler;
 	HTTPServer server(&restHandler, port);
 
 	server.Start();
