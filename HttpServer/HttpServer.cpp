@@ -126,7 +126,8 @@ void HTTPServer::AsyncAccept()
     HTTPResponse response = m_handler->HandleRequest(request);
     std::stringstream respStr;
     respStr << "HTTP/1.1 " << response.code << " OK\r\n" << "Content-Type: " << response.contentType
-            << "; charset=utf-8\r\n" << "Content-Length: " << response.body.size() << "\r\n\r\n" << response.body;
+            << "; charset=utf-8\r\n" << "Content-Length: " << response.body.size() << "\r\n\r\n" << response.body
+            << "\r\n\r\n" << "Access-Control-Allow-Origin: *;";
     n = write(newsockfd, respStr.str().c_str(), respStr.str().size());
     if (n < 0) error("ERROR writing to socket");
     close(newsockfd);
