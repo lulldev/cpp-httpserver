@@ -16,9 +16,13 @@ public:
         {
             response = PUT(request);
         }
-        if (request.method == "DELETE")
+        else if (request.method == "DELETE")
         {
             response = DELETE(request);
+        }
+        else if (request.method == "OPTIONS")
+        {
+            response = OPTIONS(request);
         }
 
         return response;
@@ -28,4 +32,5 @@ public:
     virtual HTTPResponse POST(HTTPRequest request) = 0;
     virtual HTTPResponse PUT(HTTPRequest request) = 0;
     virtual HTTPResponse DELETE(HTTPRequest request) = 0;
+    virtual HTTPResponse OPTIONS(HTTPRequest request) = 0;
 };

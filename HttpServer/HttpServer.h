@@ -15,7 +15,7 @@
 #include "Handlers/HttpHandler.h"
 #include "Handlers/RestHandler.h"
 
-#define HTTP_SERVER_BUFFER_SIZE 1024
+#define HTTP_SERVER_BUFFER_SIZE 10000
 #define HTTP_MAX_CONNECTIONS 10
 
 class HTTPServer

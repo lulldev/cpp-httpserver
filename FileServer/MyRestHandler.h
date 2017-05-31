@@ -101,6 +101,14 @@ public:
         return response;
     }
 
+    HTTPResponse OPTIONS(HTTPRequest request)
+    {
+        response.code = HTTP_SUCCESS_CODE;
+        response.contentType = JSON_CONTENT_TYPE;
+        response.body = "";
+        return response;
+    }
+
     void SetServerRootDir(const std::string &rootDir)
     {
         m_serverRootDir = rootDir;
